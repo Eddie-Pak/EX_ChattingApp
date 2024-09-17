@@ -11,6 +11,7 @@ import com.example.chattingapp.databinding.ActivityLoginBinding
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
 import com.google.firebase.database.database
+import com.google.firebase.messaging.messaging
 
 class LoginActivity : AppCompatActivity() {
 
@@ -56,15 +57,19 @@ class LoginActivity : AppCompatActivity() {
 
                     if (task.isSuccessful && currentUser != null) {
                         val userId = currentUser.uid
-                        val user = mutableMapOf<String, Any>()
-                        user["userId"] = userId
-                        user["username"] = email
 
-                        Firebase.database(DB_URL).reference.child(DB_USERS).child(userId).updateChildren(user)
+                        Firebase.messaging.token.addOnCompleteListener {
+                            val token = it.result
+                            val user = mutableMapOf<String, Any>()
+                            user["userId"] = userId
+                            user["username"] = email
+                            user["fcmToken"] = token
 
-                        val intent = Intent(this, MainActivity::class.java)
-                        startActivity(intent)
-                        finish()
+                            Firebase.database(DB_URL).reference.child(DB_USERS).child(userId).updateChildren(user)
+                            val intent = Intent(this, MainActivity::class.java)
+                            startActivity(intent)
+                            finish()
+                        }
                     } else {
                         Log.e("LoginActivity", task.exception.toString())
                         Toast.makeText(this, "로그인에 실패했습니다. 다시시도해주세요..", Toast.LENGTH_SHORT).show()
