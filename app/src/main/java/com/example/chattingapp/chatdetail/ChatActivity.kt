@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.chattingapp.Key
 import com.example.chattingapp.Key.Companion.DB_CHATS
 import com.example.chattingapp.Key.Companion.DB_CHAT_ROOMS
@@ -34,6 +35,7 @@ class ChatActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityChatBinding
     private lateinit var chatAdapter: ChatAdapter
+    private lateinit var linearLayoutManager: LinearLayoutManager
 
     private var chatRoomId: String = ""
     private var otherUserId: String = ""
@@ -49,6 +51,7 @@ class ChatActivity : AppCompatActivity() {
         binding = ActivityChatBinding.inflate(layoutInflater)
         setContentView(binding.root)
         chatAdapter = ChatAdapter()
+        linearLayoutManager = LinearLayoutManager(applicationContext)
 
         chatRoomId = intent.getStringExtra(EXTRA_CHAT_ROOM_ID) ?: return
         otherUserId = intent.getStringExtra(EXTRA_OTHER_USER_ID) ?: return
@@ -63,9 +66,17 @@ class ChatActivity : AppCompatActivity() {
             }
 
         binding.chatRecyclerView.apply {
-            layoutManager = LinearLayoutManager(context)
+            layoutManager = linearLayoutManager
             adapter = chatAdapter
         }
+
+        chatAdapter.registerAdapterDataObserver(object: RecyclerView.AdapterDataObserver() {
+            override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
+                super.onItemRangeInserted(positionStart, itemCount)
+
+                linearLayoutManager.smoothScrollToPosition(binding.chatRecyclerView, null, chatAdapter.itemCount)
+            }
+        })
 
         binding.sendButton.setOnClickListener {
             val message = binding.messageEditText.text.toString()

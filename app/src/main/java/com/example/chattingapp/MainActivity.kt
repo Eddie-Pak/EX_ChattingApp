@@ -43,14 +43,17 @@ class MainActivity : AppCompatActivity() {
             when (it.itemId) {
                 R.id.userList -> {
                     replaceFragment(userFragment)
+                    supportActionBar?.title = "친구목록"
                     return@setOnItemSelectedListener true
                 }
                 R.id.chatroomList -> {
                     replaceFragment(chatListFragment)
+                    supportActionBar?.title = "채팅목록"
                     return@setOnItemSelectedListener true
                 }
                 R.id.mayPage -> {
                     replaceFragment(myPageFragment)
+                    supportActionBar?.title = "마이페이지"
                     return@setOnItemSelectedListener true
                 }
                 else -> {
@@ -60,6 +63,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         replaceFragment(userFragment)
+        supportActionBar?.title = "친구목록"
     }
 
     private fun replaceFragment(fragment: Fragment) {
